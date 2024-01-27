@@ -105,18 +105,33 @@ export async function getStaticPaths() {
 
 // `getStaticPaths` requires using `getStaticProps`
 export async function getStaticProps({ params: { slug } }) {
-    const category = await fetchDataFromApi(
-        `/api/categories?filters[slug][$eq]=${slug}`
-    );
-    const products = await fetchDataFromApi(
-        `/api/products?populate=*&[filters][categories][slug][$eq]=${slug}&pagination[page]=1&pagination[pageSize]=${maxResult}`
-    );
+    try {
+        // Fetching category data
+        const category = await fetchDataFromApi(
+            `/api/categories?filters[slug][$eq]=${slug}`
+        );
 
-    return {
-        props: {
-            category,
-            products,
-            slug,
-        },
-    };
+        console.log('Category Data:', category);
+
+        // Fetching products data
+        const products = await fetchDataFromApi(
+            `/api/products?populate=*&[filters][categories][slug][$eq]=${slug}&pagination[page]=1&pagination[pageSize]=${maxResult}`
+        );
+
+        console.log('Products Data:', products);
+
+        return {
+            props: {
+                category,
+                products,
+                slug,
+            },
+        };
+    } catch (error) {
+        console.error('Error fetching data:', error.message);
+
+        return {
+            notFound: true,
+        };
+    }
 }
