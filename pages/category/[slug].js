@@ -14,8 +14,8 @@ const Category = ({ category, products, slug }) => {
         setPageIndex(1);
     }, [query]);
 
-    const { data, error, isLoading } = useSWR(
-        `/api/products?populate=*&[filters][categories][slug][$eq]=${slug}&pagination[page]=${pageIndex}&pagination[pageSize]=${maxResult}`,
+   const { data, error, isLoading } = useSWR(
+        encodeURI(`/api/products?populate=*&[filters][categories][slug][$eq]=${slug}&pagination[page]=${pageIndex}&pagination[pageSize]=${maxResult}`),
         fetchDataFromApi,
         {
             fallbackData: products,
