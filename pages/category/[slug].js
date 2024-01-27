@@ -90,17 +90,39 @@ const Category = ({ category, products, slug }) => {
 export default Category;
 
 export async function getStaticPaths() {
-    const category = await fetchDataFromApi("/api/categories?populate=*");
-    const paths = category?.data?.map((c) => ({
-        params: {
-            slug: c.attributes.slug,
-        },
-    }));
+    try {
+        // Fetching category data
+        const categories = await fetchDataFromApi("/api/categories?populate=*");
 
-    return {
-        paths,
-        fallback: false,
-    };
+        // Check if categories exist and have data
+        if (!categories || !categories.data) {
+            // If categories or categories.data is falsy, return an empty array for paths
+            // and set fallback to false.
+            return {
+                paths: [],
+                fallback: false,
+            };
+        }
+
+        // Map categories to paths
+        const paths = categories.data.map((category) => ({
+            params: {
+                slug: category.attributes.slug,
+            },
+        }));
+
+        return {
+            paths,
+            fallback: false,
+        };
+    } catch (error) {
+        console.error('Error fetching data:', error.message);
+
+        // If there is an error fetching data, return notFound: true.
+        return {
+            notFound: true,
+        };
+    }
 }
 
 // `getStaticPaths` requires using `getStaticProps`
